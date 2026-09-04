@@ -1,5 +1,8 @@
 # EX-NO-9-RSA-Algorithm
 
+## Name: Guru Prasad D.R.
+## Reg.No:212225040104
+
 ## AIM:
 To Implement RSA Encryption Algorithm in Cryptography
 
@@ -38,58 +41,109 @@ The security of RSA relies on the difficulty of factoring large numbers; thus, c
 ## Program:
 ```
 #include <stdio.h>
-#include <math.h>
+#include <string.h>
 
-// Function to find gcd
-int gcd(int a, int b) {
-    if (b == 0)
-        return a;
-    return gcd(b, a % b);
-}
-
-// Function to find modular exponentiation (m^e mod n)
-long long modExp(long long base, long long exp, long long mod) {
+long long powerMod(long long base, long long exp, long long mod)
+{
     long long result = 1;
-    for (int i = 0; i < exp; i++)
+
+    while (exp > 0)
+    {
         result = (result * base) % mod;
+        exp--;
+    }
+
     return result;
 }
 
-int main() {
-    int p, q, n, phi, e, d = 0;
-    long long msg, c, m;
+int gcd(int a, int b)
+{
+    while (b != 0)
+    {
+        int temp = b;
+        b = a % b;
+        a = temp;
+    }
+    return a;
+}
 
-    printf("Enter two prime numbers (p and q): ");
-    scanf("%d %d", &p, &q);
+int modInverse(int e, int phi)
+{
+    int d;
+
+    for (d = 1; d < phi; d++)
+    {
+        if ((e * d) % phi == 1)
+            return d;
+    }
+
+    return -1;
+}
+
+int main()
+{
+    int p, q, e, n, phi, d;
+    char plaintext[100];
+    long long encrypted[100];
+    char decrypted[100];
+    int i;
+
+    printf("Enter prime number p: ");
+    scanf("%d", &p);
+
+    printf("Enter prime number q: ");
+    scanf("%d", &q);
+
+    printf("Enter public exponent e: ");
+    scanf("%d", &e);
+
+    getchar();
+
+    printf("Enter plaintext message: ");
+    fgets(plaintext, sizeof(plaintext), stdin);
+
+    plaintext[strcspn(plaintext, "\n")] = '\0';
 
     n = p * q;
     phi = (p - 1) * (q - 1);
 
-    // choose e
-    for (e = 2; e < phi; e++) {
-        if (gcd(e, phi) == 1)
-            break;
+    if (gcd(e, phi) != 1)
+    {
+        printf("Invalid public exponent e.\n");
+        return 0;
     }
 
-    // compute d
-    for (int i = 1; i < phi; i++) {
-        if ((i * e) % phi == 1) {
-            d = i;
-            break;
-        }
+    d = modInverse(e, phi);
+
+    printf("\n----- RSA RESULT -----\n");
+    printf("n = %d\n", n);
+    printf("phi(n) = %d\n", phi);
+    printf("Public Key  : (%d, %d)\n", e, n);
+    printf("Private Key : (%d, %d)\n", d, n);
+
+    printf("\nOriginal Message : %s\n", plaintext);
+
+    printf("Encrypted Message: ");
+
+    for (i = 0; plaintext[i] != '\0'; i++)
+    {
+        encrypted[i] = powerMod((int)plaintext[i], e, n);
+        printf("%lld ", encrypted[i]);
     }
 
-    printf("Public Key: {%d, %d}\n", e, n);
-    printf("Private Key: {%d, %d}\n", d, n);
+    printf("\n");
 
-    printf("Enter message (number) to encrypt: ");
-    scanf("%lld", &msg);
+    printf("Decrypted Message: ");
 
-    c = modExp(msg, e, n);
-    printf("Encrypted message: %lld\n", c);
+    for (i = 0; plaintext[i] != '\0'; i++)
+    {
+        decrypted[i] = (char)powerMod(encrypted[i], d, n);
+        printf("%c", decrypted[i]);
+    }
 
-    m = modExp(c, d, n);
-    printf("Decrypted message: %lld\n", m);
+    decrypted[i] = '\0';
+
+    printf("\n");
 
     return 0;
 }
@@ -97,7 +151,8 @@ int main() {
 
 ## Output:
 
-<img width="723" height="535" alt="image" src="https://github.com/user-attachments/assets/fc8b981f-9f5f-499e-9dcf-61ded5cbc5ef" />
+<img width="1845" height="681" alt="image" src="https://github.com/user-attachments/assets/9e079caf-0a19-4cbd-a34f-f9b300f51e5d" />
+
 
 
 ## Result:
